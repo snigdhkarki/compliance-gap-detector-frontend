@@ -1,0 +1,7 @@
+[theme]
+base = "dark"
+primaryColor = "#00CFFD"           # Electric Blue
+backgroundColor = "#1E1E2F"        # Charcoal Black
+secondaryBackgroundColor = "#121826" # Deep Navy Blue
+textColor = "#EDEDED"              # Soft Light Grey
+font = "sans serif"
