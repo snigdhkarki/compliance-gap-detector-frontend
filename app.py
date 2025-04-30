@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import tempfile
 import random
+from pathlib import Path
 
 # --- UI CONFIG ---
 st.set_page_config(page_title="Compliance Gap Detector", layout="wide")
@@ -32,12 +33,29 @@ for i, fw in enumerate(frameworks):
         if col2.checkbox(fw): selected_frameworks.append(fw)
     else:
         if col3.checkbox(fw): selected_frameworks.append(fw)
-
 # --- Upload ZIP File ---
 st.markdown("### Upload Your ZIP File")
 
 uploaded_file = st.file_uploader("Upload ZIP File Containing Policy Documents (.zip)", type="zip")
 
+if uploaded_file is not None:
+
+    # Define the target directory
+    output_dir = Path("internal_policy")
+    output_dir.mkdir(exist_ok=True)
+
+    # Save the uploaded file temporarily
+    zip_path = output_dir / "temp_upload.zip"
+    with open(zip_path, "wb") as f:
+        f.write(uploaded_file.read())
+
+    # Unzip the file
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(output_dir)
+    zip_path.unlink()
+    
+    #USE THE CODE THAT TAKES LIST OF FRAMEWORK NAMES AND OUTPUTS CONSISE REPORT HERE
+    #consise_report=main_code(selected_frameworks)
 
 # --- Dummy Gap Generator ---
 def generate_dummy_gaps():
