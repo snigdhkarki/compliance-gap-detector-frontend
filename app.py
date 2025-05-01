@@ -7,7 +7,8 @@ import random
 from pathlib import Path
 import re
 from textwrap import dedent
-
+import plotly.express as px
+from collections import Counter
 
 # --- UI CONFIG ---
 st.set_page_config(page_title="Compliance Gap Detector", layout="wide")
@@ -138,6 +139,16 @@ def parse_report(text):
         })
     
     return entries
+def normalize_response(value):
+    val = value.strip('*').strip().lower()
+    if val == 'satisfied':
+        return 'Yes'
+    elif val == 'not satisfied':
+        return 'No'
+    elif val == 'missing':
+        return 'Miss'
+    else:
+        return 'Unknown'  # fallback if unexpected input
 
 # --- Display Results ---
 if uploaded_file and selected_frameworks:
@@ -182,6 +193,33 @@ Identify by category or categories the personal information of the consumer that
     """
     # gap_and_status = [{"gap":"snigdh","status":"lol"}, {"gap":"sussy", "status":"fuhrer"}]
     dict_report = parse_report(consise_report)
+    Status_list = [d['Status'] for d in dict_report]
+    print(Status_list)
+    
+
+
+    output_list = [normalize_response(val) for val in Status_list]
+    print(output_list)
+    counts = Counter(output_list)
+
+    # Create DataFrame for plotly
+    labels = list(counts.keys())
+    values = list(counts.values())
+
+    # Create pie chart
+    fig = px.pie(
+        names=labels,
+        values=values,
+        title='Response Distribution',
+        color=labels,
+        color_discrete_map={'Yes':'green', 'No':'red', 'Miss':'gray'}
+    )
+
+    # Display in Streamlit
+    st.plotly_chart(fig)
+
+
+
     data = []
     for dic in dict_report:
         data.append((dic["Requirement"], dic["Status"], dic["Reason"], dic["Target Policy"]))
